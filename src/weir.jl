@@ -59,7 +59,7 @@ end
 
 move_vertex_to!(w::Weir, ind::Integer, v::Point{2,T}) where {T<:Real} =
     move_vertex_to!(w, ind, Point4f0(v..., 0, 1))
-move_vertex_to!(w::Weir, ind::Integer, v::Point{2,T}) where {T<:Real} =
+move_vertex_to!(w::Weir, ind::Integer, v::Point{3,T}) where {T<:Real} =
     move_vertex_to!(w, ind, Point4f0(v..., 1))
 function move_vertex_to!(w::Weir, ind::Integer, v::Point)
     w.verts[ind] = v

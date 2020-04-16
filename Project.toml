@@ -1,7 +1,7 @@
 name = "Inconvergent"
 uuid = "7894188f-4941-4afe-bd45-125c529f5e94"
 authors = ["snotskie "]
-version = "0.1.3"
+version = "0.1.4"
 
 [deps]
 
