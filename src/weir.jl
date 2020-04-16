@@ -21,6 +21,10 @@ function add_edge!(w::Weir, ind1::Integer, ind2::Integer)
     return LightGraphs.add_edge!(w.graph, ind1, ind2)
 end
 
+function rem_edge!(w::Weir, ind1::Integer, ind2::Integer)
+    return LightGraphs.rem_edge!(w.graph, ind1, ind2)
+end
+
 function get_vertex(w::Weir, ind::Integer)
     return w.verts[ind]
 end
@@ -41,7 +45,7 @@ add_vertex!(w::Weir, vert::Point{2,T}) where {T<:Real} =
     add_vertex!(w, Point4f0(vert..., 0, 1))
 add_vertex!(w::Weir, vert::Point{3,T}) where {T<:Real} =
     add_vertex!(w, Point4f0(vert..., 1))
-function add_vertex!(w::Weir, vert::Point4f0)
+function add_vertex!(w::Weir, vert::Point)
     LightGraphs.add_vertex!(w.graph)
     push!(w.verts, vert)
     return nv(w.graph)
@@ -64,4 +68,17 @@ move_vertex_to!(w::Weir, ind::Integer, v::Point{3,T}) where {T<:Real} =
 function move_vertex_to!(w::Weir, ind::Integer, v::Point)
     w.verts[ind] = v
     return w.verts[ind]
-end 
+end
+
+# modified: not optimized with a kdtree, only edges from lower to higher index
+function add_relative_neighboorhood_edges!(w::Weir, dist::Real)
+    for (i, a) in get_vertices(w)
+        for (j, b) in get_vertices(w)
+            if a < b
+                if dist^2 >= sum((a .- b) .^ 2)
+                    add_edge!(w, i, j)
+                end
+            end
+        end
+    end
+end

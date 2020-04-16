@@ -1,3 +1,4 @@
+# TODO declare projection up front
 mutable struct Sandpaint{T<:Integer, U<:TransparentColor, V<:Colorant}
     size::T
 
