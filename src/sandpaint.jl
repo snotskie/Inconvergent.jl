@@ -1,5 +1,4 @@
-# TODO declare projection up front
-mutable struct Sandpaint{T<:Integer, U<:TransparentColor, V<:Colorant}
+mutable struct Sandpaint{T<:Integer, U<:TransparentColor, V<:Colorant, W<:Real}
     size::T
 
     # modified: a 2d array of colors instead of a flat array
@@ -8,11 +7,16 @@ mutable struct Sandpaint{T<:Integer, U<:TransparentColor, V<:Colorant}
     bg::V
 
     # modified: removed indfx
+    
+    # modified: added quat and quat_inv
+    quat::Quaternions.Quaternion{W}
+    quat_inv::Quaternions.Quaternion{W}
 end
 
 function Sandpaint(size::Integer=1000,
                    fg::Colorant=RGBA(0, 0, 0, 1),
-                   bg::Colorant=RGBA(1, 1, 1, 1))
+                   bg::Colorant=RGBA(1, 1, 1, 1),
+                   quat::Quaternions.Quaternion=Quaternions.Quaternion(1, 0, 0, 0))
     
     # modified: replacing the pigment:with
     if !hasproperty(fg, :alpha)
@@ -27,7 +31,10 @@ function Sandpaint(size::Integer=1000,
     vals = [RGBA(bg) for i in 1:(size^2)]
     vals = reshape(vals, (size, size))
 
-    return Sandpaint(size, vals, fg, bg)
+    # modified: added quat
+    quat = Quaternions.Quaternion{Float64}(quat)
+
+    return Sandpaint(size, vals, fg, bg, quat, quat^-1)
 end
 
 # modified: -inside-floor renamed, params simplified, +1 for julia, calls cb only when not oob
@@ -57,10 +64,31 @@ function __draw_stroke(sand::Sandpaint, source::Point, dest::Point, grains::Inte
     for rn in sample_points_from_line(grains, source, dest)
 
         # modified: do-syntax instead of using a macro
-        __with_point_inside_floor(rn, sand) do i, j
+        # modified: projection
+        __with_point_inside_floor(__project(sand, rn), sand) do i, j
             __draw_point_over(sand, i, j)
         end
     end
+end
+
+__project(sand::Sandpaint, p::Point{2,T}) where {T<:Real} =
+    __project(sand, Quaternions.Quaternion(0,
+        p[1]-sand.size/2,
+        p[2]-sand.size/2,
+        0))
+__project(sand::Sandpaint, p::Point{3,T}) where {T<:Real} =
+    __project(sand, Quaternions.Quaternion(0,
+        p[1]-sand.size/2,
+        p[2]-sand.size/2,
+        p[3]))
+__project(sand::Sandpaint, p::Point{4,T}) where {T<:Real} =
+    __project(sand, Quaternions.Quaternion(0,
+        p[1]-sand.size/2,
+        p[2]-sand.size/2,
+        p[3]))
+function __project(sand::Sandpaint, p::Quaternions.Quaternion)
+    t = sand.quat * p * sand.quat_inv
+    return Point2f0(t.v1 + sand.size/2, t.v2 + sand.size/2)
 end
 
 # modified: replaced line param with two points
@@ -80,7 +108,7 @@ end
 # modified: renamed from pix
 function points(sand::Sandpaint, pts) # pts should be an interable of Point
     for pt::Point in pts
-        __with_point_inside_floor(pt, sand) do i, j
+        __with_point_inside_floor(__project(sand, pt), sand) do i, j
             __draw_point_over(sand, i, j)
         end
     end

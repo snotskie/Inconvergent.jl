@@ -5,6 +5,7 @@ using GeometryTypes
 using Colors
 using Images
 using Makie
+using Quaternions
 
 include("./random.jl")
 include("./sandpaint.jl")

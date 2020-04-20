@@ -6,37 +6,38 @@ function lines_example()
     itt2 = 100 # modified: split from itt, set smaller
     sand = Sandpaint(size,
                      RGBA(colorant"black", 0.01),
-                     colorant"white")
+                     colorant"white",
+                     Quaternions.Quaternion(cos(pi/6), 0, sin(pi/6), sin(pi/6))) # modified: added quat
     
     # modified: removed the outermost loop
-    p1 = Point2f0(100, 500)
-    p2 = Point2f0(900, 500)
+    p1 = Point4f0(100, 500, 0, 1)
+    p2 = Point4f0(900, 500, 0, 1)
     for j in LinRange(0, 15, repeat+1)
         wer = Weir()
 
-        va = Point2f0(0, 0)
+        pa = Point4f0(0, 0, 0, 1)
         for s in LinRange(0, 1, itt)
-            v1 = s*(p2 - p1) + p1
-            v2 = v1 + va
-            va = random_point_in_circle(0.7 * j, va)
+            p3 = s*(p2 - p1) + p1
+            p4 = p3 + pa
+            pa = random_point_in_circle(0.7 * j, pa)
 
             # modified: grabbing the ind values
-            ind1 = add_vertex!(wer, v1)
-            ind2 = add_vertex!(wer, v2)
+            ind1 = add_vertex!(wer, p3)
+            ind2 = add_vertex!(wer, p4)
             add_edge!(wer, ind1, ind2)
         end
 
         # modified: restructured, pulled this out a nest,
         # so that above we create the edges, and below we
         # draw the sand strokes.
-        vb = Point2f0(0, 0)
+        pb = Point4f0(0, 0, 0, 1)
         for k in 1:itt2
-            vb = random_point_in_circle(0.001 * j, vb)
+            pb = random_point_in_circle(0.001 * j, pb)
             for e in edges(wer)
                 source = get_vertex(wer, e.src)
                 dest = get_vertex(wer, e.dst)
-                move_vertex_by!(wer, e.src, random_point_in_circle(0.1, vb))
-                move_vertex_by!(wer, e.dst, random_point_in_circle(0.1, vb))
+                move_vertex_by!(wer, e.src, random_point_in_circle(0.1, pb))
+                move_vertex_by!(wer, e.dst, random_point_in_circle(0.1, pb))
                 stroke(sand, source, dest, grains)
             end
 

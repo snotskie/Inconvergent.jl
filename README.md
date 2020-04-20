@@ -26,10 +26,10 @@ Most of the original weir already existed in the Julia ecosystem, so what Inconv
 
 ## TODO
 
-- Refactor random.jl to return 4d points and accept any-d points
-- Adjust Sandpaint so you can specify which projection to use
-- Refactor sandpaint.jl to accept any-d points
-- Finish implementing examples, with images for each result
-- Finish implementing Sandpaint drawing methods
-- Finish implementing Weir alteration methods
-- Finish testing Makie as a replacement for weir's svg
+- [x] Refactor random.jl to return 4d points and accept any-d points: DONE
+- [x] Adjust Sandpaint so you can specify which projection to use
+- [x] Refactor sandpaint.jl to accept any-d points: SKIP can just do this by having a project function that accepts any-d points, and use that within the exported draw functions to then move down to 2d points for the low-level `__` functions
+- [ ] Finish implementing examples, with images for each result
+- [ ] Finish implementing Sandpaint drawing methods
+- [ ] Finish implementing Weir alteration methods
+- [ ] Finish testing Makie as a replacement for weir's svg
