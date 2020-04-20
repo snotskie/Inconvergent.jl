@@ -33,3 +33,4 @@ Most of the original weir already existed in the Julia ecosystem, so what Inconv
 - [ ] Finish implementing Sandpaint drawing methods
 - [ ] Finish implementing Weir alteration methods
 - [ ] Finish testing Makie as a replacement for weir's svg
+- [ ] Add Quaternions to toml
